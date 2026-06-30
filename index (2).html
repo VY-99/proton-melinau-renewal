@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Insurance Renewal – Proton Melinau Auto Likas</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F0FDF4; color: #1E293B; min-height: 100vh; }
+
+  /* HEADER */
+  .header { background: linear-gradient(135deg,#15803D,#166534); padding: 18px 20px; color: white; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; max-width: 780px; margin: 0 auto; }
+  .header-branch { font-size: 10px; letter-spacing: 2px; opacity: 0.75; text-transform: uppercase; }
+  .header-title { font-size: 18px; font-weight: 700; margin-top: 2px; }
+  .header-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+  .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .sa-box { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 12px; font-size: 13px; }
+  .sa-box input { background: transparent; border: none; border-bottom: 1px solid white; color: white; font-size: 13px; outline: none; width: 110px; }
+  .btn-refresh { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); color: white; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-refresh:hover { background: rgba(255,255,255,0.3); }
+
+  /* STATS */
+  .stats { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; max-width: 780px; margin-left: auto; margin-right: auto; margin-top: 14px; }
+  .stat { border-radius: 8px; padding: 5px 14px; text-align: center; cursor: pointer; border: 1px solid transparent; transition: border 0.2s; }
+  .stat:hover { border-color: white; }
+  .stat.active { border-color: white; }
+  .stat-val { font-size: 18px; font-weight: 700; }
+  .stat-label { font-size: 10px; opacity: 0.85; }
+
+  /* BODY */
+  .body { max-width: 780px; margin: 0 auto; padding: 16px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; background: white; color: #374151; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: all 0.15s; }
+  .tab.active { background: #15803D; color: white; box-shadow: 0 2px 8px rgba(21,128,61,0.3); }
+  .saving-label { font-size: 12px; color: #64748B; align-self: center; margin-left: 6px; }
+
+  /* SEARCH */
+  .search-input { width: 100%; padding: 8px 14px; border-radius: 8px; border: 1.5px solid #E2E8F0; font-size: 14px; outline: none; font-family: inherit; margin-bottom: 12px; }
+  .search-input:focus { border-color: #16A34A; }
+
+  /* FILTER PILLS */
+  .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .pill { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #E2E8F0; font-size: 12px; font-weight: 600; cursor: pointer; background: white; }
+  .pill.active { background: #15803D; color: white; border-color: #15803D; }
+
+  /* CUSTOMER CARD */
+  .card { background: white; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid #E2E8F0; }
+  .card-name { font-weight: 700; font-size: 15px; }
+  .card-meta { font-size: 12px; color: #64748B; margin-top: 3px; }
+  .card-remarks { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .status-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .card-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .btn-wa { background: #25D366; color: white; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-copy { background: #F1F5F9; color: #374151; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-quote-ready { background: #5B21B6; color: white; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-quote-pending { background: #F1F5F9; color: #94A3B8; border: 1.5px dashed #CBD5E1; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: not-allowed; }
+  .btn-getquote { background: #FFEDD5; color: #9A3412; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-followup { background: #FEF9C3; color: #854D0E; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-thanks { background: #DCFCE7; color: #166534; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-covernote { background: #CFFAFE; color: #155E75; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-preview { background: #EFF6FF; color: #1D4ED8; border: none; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .status-select { font-size: 12px; border-radius: 7px; border: 1px solid #E2E8F0; padding: 5px 8px; background: #F8FAFC; cursor: pointer; font-family: inherit; }
+  .preview-box { margin-top: 10px; background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 12px; font-size: 13px; white-space: pre-wrap; color: #166534; line-height: 1.6; display: none; }
+  .preview-box.show { display: block; }
+
+  /* ADD FORM */
+  .form-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .form-title { font-weight: 700; font-size: 16px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { font-size: 13px; font-weight: 600; color: #374151; display: block; margin-bottom: 4px; }
+  .form-group input, .form-group select { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #E2E8F0; font-size: 14px; outline: none; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus { border-color: #16A34A; }
+  .btn-add { background: #15803D; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 4px; }
+  .btn-add:hover { background: #166534; }
+  .btn-add:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* EMPTY / LOADING */
+  .empty { text-align: center; padding: 40px; color: #94A3B8; font-size: 14px; }
+
+  /* TOAST */
+  .toast { position: fixed; top: 16px; right: 16px; z-index: 999; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-width: 320px; display: none; }
+  .toast.show { display: block; }
+  .toast.success { background: #DCFCE7; color: #166534; border: 1px solid #166534; }
+  .toast.error { background: #FEE2E2; color: #991B1B; border: 1px solid #991B1B; }
+  .toast.info { background: #DBEAFE; color: #1E40AF; border: 1px solid #1E40AF; }
+
+  /* FOOTER */
+  .footer { text-align: center; font-size: 11px; color: #94A3B8; margin-top: 20px; padding-bottom: 20px; }
+
+  @media (max-width: 500px) {
+    .header { padding: 14px; }
+    .body { padding: 12px; }
+    .card-actions { gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-branch">Proton Melinau Auto Likas · e-Gate Branch</div>
+      <div class="header-title">🚗 Insurance Renewal Broadcast</div>
+      <div class="header-sub">Live sync with Google Sheets</div>
+    </div>
+    <div class="header-right">
+      <div class="sa-box">
+        SA: <span id="sa-display" onclick="editSA()" style="font-weight:600;cursor:pointer;">Your Name ✏️</span>
+        <input id="sa-input" type="text" value="Your Name" onblur="saveSA()" onkeydown="if(event.key==='Enter')saveSA()" style="display:none;" />
+      </div>
+      <button class="btn-refresh" onclick="fetchData()">🔄 Refresh</button>
+    </div>
+  </div>
+  <div style="max-width:780px;margin:14px auto 0;">
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tab-list" onclick="switchTab('list')">📋 Customer List</button>
+    <button class="tab" id="tab-add" onclick="switchTab('add')">➕ Add Customer</button>
+    <span class="saving-label" id="saving-label" style="display:none;">⏳ Saving to Sheet...</span>
+  </div>
+
+  <!-- LIST TAB -->
+  <div id="panel-list">
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <input class="search-input" type="text" id="search" placeholder="🔍 Search by name or plate..." oninput="renderList()" style="margin-bottom:0;flex:1;min-width:180px;" />
+      <input class="search-input" type="text" id="sa-filter" placeholder="👤 Filter by SA name..." oninput="renderList()" style="margin-bottom:0;flex:1;min-width:180px;" />
+      <select id="month-filter" onchange="renderList()" style="padding:8px 12px;border-radius:8px;border:1.5px solid #E2E8F0;font-size:14px;font-family:inherit;outline:none;background:white;min-width:150px;">
+        <option value="">📅 All Months</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+      <div class="filter-pills" id="filter-pills" style="margin-bottom:0;"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button id="toggle-renewed" onclick="toggleRenewed()" style="background:#DCFCE7;color:#166534;border:1px solid #86EFAC;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">🏆 Show Renewed (<span id="renewed-count">0</span>)</button>
+        <button id="toggle-nr" onclick="toggleNoResponse()" style="background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">👁 Show No Response (<span id="nr-count">0</span>)</button>
+      </div>
+    </div>
+    <div id="customer-list"></div>
+  </div>
+
+  <!-- ADD TAB -->
+  <div id="panel-add" style="display:none;">
+    <div class="form-card">
+      <div class="form-title">➕ Add New Customer to Google Sheet</div>
+      <div class="form-group"><label>Customer Name *</label><input type="text" id="f-name" placeholder="e.g. Ahmad Rizal" /></div>
+      <div class="form-group"><label>Phone Number * (with country code)</label><input type="text" id="f-phone" placeholder="e.g. 60123456789" /></div>
+      <div class="form-group"><label>Plate Number *</label><input type="text" id="f-plate" placeholder="e.g. QA1234B" /></div>
+      <div class="form-group"><label>Insurance Expiry Date *</label><input type="text" id="f-expiry" placeholder="e.g. 15 Jul 2026" /></div>
+      <div class="form-group"><label>SA Name</label><input type="text" id="f-sa" placeholder="e.g. Hafizuddin" /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status">
+          <option>Pending</option><option>Sent</option><option>Renewed</option><option>No Response</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Remarks</label><input type="text" id="f-remarks" placeholder="e.g. Customer called in" /></div>
+      <button class="btn-add" id="btn-add" onclick="addCustomer()">✅ Add to Google Sheet</button>
+    </div>
+  </div>
+
+  <div class="footer">Live connected to Google Sheets · Proton Melinau Auto Likas</div>
+</div>
+
+
+<!-- COVER NOTE INSURER SELECT MODAL -->
+<div id="cn-select-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;padding:22px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="font-weight:700;font-size:16px;">📄 Select Confirmed Insurer</div>
+      <button onclick="closeCNSelectModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94A3B8;">✕</button>
+    </div>
+    <div id="cn-customer-name" style="font-size:13px;color:#64748B;margin-bottom:14px;"></div>
+    <div id="cn-insurer-options" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+
+<style>
+.cn-insurer-btn {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 10px;
+  padding: 12px 16px; font-size: 14px; font-weight: 700; color: #166534;
+  cursor: pointer; transition: all 0.15s;
+}
+.cn-insurer-btn:hover { background: #166534; color: white; border-color: #166534; }
+</style>
+
+<script>
+const API_KEY  = "AIzaSyAzX-jkMLLokqyXcQCgnrC8XOgJY5esXu8";
+const SHEET_ID = "1rXpbGSiyByQZk8QMmViZ4n5RFEMaJm3MBY-QG7-5luI";
+const SHEET    = "CUSTOMER DATA";
+let showNoResponse = false;
+let showRenewed = false;
+const BASE       = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4VFxheUvwzL370z3OTsGCjPoMzIhex99K2J4phekeP-FWXcLxfSlGhhz0vVdvjfbz/exec";
+
+let customers    = [];
+let filterStatus = "All";
+let saName       = "Your Name";
+let openPreview  = null;
+
+const STATUS_META = {
+  "Pending":     { bg:"#FEF9C3", text:"#854D0E", border:"#FDE047" },
+  "Sent":        { bg:"#DBEAFE", text:"#1E40AF", border:"#93C5FD" },
+  "Renewed":     { bg:"#DCFCE7", text:"#166534", border:"#86EFAC" },
+  "No Response": { bg:"#FEE2E2", text:"#991B1B", border:"#FCA5A5" },
+};
+
+function showToast(msg, type="info") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = "toast", 3000);
+}
+
+function setSaving(on) {
+  document.getElementById("saving-label").style.display = on ? "inline" : "none";
+}
+
+// ── SA Name edit ─────────────────────────────────────────────────────────────
+function editSA() {
+  document.getElementById("sa-display").style.display = "none";
+  const inp = document.getElementById("sa-input");
+  inp.style.display = "inline";
+  inp.focus();
+}
+function saveSA() {
+  saName = document.getElementById("sa-input").value || "Your Name";
+  const d = document.getElementById("sa-display");
+  d.textContent = saName + " ✏️";
+  d.style.display = "inline";
+  document.getElementById("sa-input").style.display = "none";
+  // Refresh all preview boxes with updated SA name
+  const filtered = getFiltered();
+  filtered.forEach((c,i) => {
+    const box = document.getElementById(`prev-${i}`);
+    if (box) box.textContent = buildMsg(c);
+  });
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ["list","add"].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle("active", t===tab);
+    document.getElementById(`panel-${t}`).style.display = t===tab ? "block" : "none";
+  });
+}
+
+// ── Fetch from Sheets ────────────────────────────────────────────────────────
+async function fetchData() {
+  document.getElementById("customer-list").innerHTML = '<div class="empty">⏳ Loading from Google Sheets...</div>';
+  try {
+    const range = encodeURIComponent(`${SHEET}!A1:R300`);
+    const res = await fetch(`${BASE}/values/${range}?key=${API_KEY}&valueRenderOption=FORMATTED_VALUE`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const rows = data.values || [];
+    if (rows.length < 2) { customers = []; renderAll(); return; }
+    const hdrs = rows[0].map(h => h.toLowerCase().trim());
+    customers = rows.slice(1).map((row, i) => {
+      const obj = { _row: i+2 };
+      hdrs.forEach((h,j) => obj[h] = row[j] || "");
+      if (!obj.status) obj.status = "Pending";
+      return obj;
+    }).filter(r => r.name);
+    showToast(`Loaded ${customers.length} customers ✅`, "success");
+    populateMonthFilter();
+    renderAll();
+  } catch(e) {
+    showToast("Failed to load: " + e.message, "error");
+    document.getElementById("customer-list").innerHTML = `<div class="empty">❌ Could not load data.<br/><small>${e.message}</small><br/><br/>Make sure your Google Sheet is shared as <b>Anyone with the link → Editor</b>.</div>`;
+  }
+}
+
+// ── Render stats + filter pills + list ──────────────────────────────────────
+function renderAll() {
+  renderStats();
+  renderPills();
+  renderList();
+}
+
+// ── Check if date is within 2 months from today ──────────────────────────────
+function isWithin2Months(dateStr) {
+  if (!dateStr || dateStr === "-") return true; // show if no date
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const twoMonthsLater = new Date(today);
+  twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 2);
+
+  // Try DD/MM/YYYY
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    const d = new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+    return d <= twoMonthsLater;
+  }
+  // Try "DD MMM YYYY"
+  const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const p = dateStr.trim().split(" ");
+  if (p.length >= 3) {
+    const m = months[p[1].toLowerCase().slice(0,3)];
+    const y = parseInt(p[2]);
+    const day = parseInt(p[0]);
+    if (m !== undefined && !isNaN(y)) {
+      const d = new Date(y, m, day);
+      return d <= twoMonthsLater;
+    }
+  }
+  return true;
+}
+
+// ── Check if date has passed ─────────────────────────────────────────────────
+function isDatePast(dateStr) {
+  if (!dateStr || dateStr === "-") return false;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  // Try DD/MM/YYYY
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    const d = new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+    return d < today;
+  }
+  // Try "DD MMM YYYY" e.g. "16 Sep 2026"
+  const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const p = dateStr.trim().split(" ");
+  if (p.length >= 3) {
+    const m = months[p[1].toLowerCase().slice(0,3)];
+    const y = parseInt(p[2]);
+    const day = parseInt(p[0]);
+    if (m !== undefined && !isNaN(y)) {
+      const d = new Date(y, m, day);
+      return d < today;
+    }
+  }
+  return false;
+}
+
+// ── Month key helper ─────────────────────────────────────────────────────────
+function getMonthKey(dateStr) {
+  if (!dateStr || dateStr === "-") return "";
+  // Try parse DD/MM/YYYY
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    const month = parseInt(parts[1]);
+    const year = parseInt(parts[2]);
+    if (!isNaN(month) && !isNaN(year)) {
+      return year + "-" + String(month).padStart(2, "0");
+    }
+  }
+  // Try parse "DD MMM YYYY" e.g. "16 Sep 2026"
+  const months = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+  const p = dateStr.trim().split(" ");
+  if (p.length >= 3) {
+    const m = months[p[1].toLowerCase().slice(0,3)];
+    const y = parseInt(p[2]);
+    if (m && !isNaN(y)) return y + "-" + String(m).padStart(2, "0");
+  }
+  return "";
+}
+
+function getMonthLabel(key) {
+  if (!key) return "";
+  const [year, month] = key.split("-");
+  const monthNames = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return monthNames[parseInt(month)] + " " + year;
+}
+
+function populateMonthFilter() {
+  const sel = document.getElementById("month-filter");
+  if (!sel) return;
+  const keys = new Set();
+  customers.forEach(c => {
+    const key = getMonthKey(getExpiryDate(c.expiry || ""));
+    if (key) keys.add(key);
+  });
+  const sorted = Array.from(keys).sort();
+  // Keep current selection
+  const current = sel.value;
+  sel.innerHTML = '<option value="">📅 All Months</option>';
+  sorted.forEach(k => {
+    const opt = document.createElement("option");
+    opt.value = k;
+    opt.textContent = "📅 " + getMonthLabel(k);
+    if (k === current) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderStats() {
+  // Update No Response count button
+  const nrCount = customers.filter(c => c.status === "No Response").length;
+  const nrEl = document.getElementById("nr-count");
+  if (nrEl) nrEl.textContent = nrCount;
+  const btn = document.getElementById("toggle-nr");
+  if (btn && !showNoResponse) btn.innerHTML = "👁 Show No Response (" + nrCount + ")";
+  const renewedCount = customers.filter(c => c.status === "Renewed").length;
+  const renewedEl = document.getElementById("renewed-count");
+  if (renewedEl) renewedEl.textContent = renewedCount;
+  const renewedBtn = document.getElementById("toggle-renewed");
+  if (renewedBtn && !showRenewed) renewedBtn.innerHTML = "🏆 Show Renewed (" + renewedCount + ")";
+  const counts = {
+    "All": customers.length,
+    "Pending": customers.filter(c=>c.status==="Pending").length,
+    "Sent": customers.filter(c=>c.status==="Sent").length,
+    "Quote Requested": customers.filter(c=>c.status==="Quote Requested").length,
+    "Quoted": customers.filter(c=>c.status==="Quoted").length,
+    "Sent to Customer": customers.filter(c=>c.status==="Sent to Customer").length,
+    "Cover Note Issued": customers.filter(c=>c.status==="Cover Note Issued").length,
+    "Renewed": customers.filter(c=>c.status==="Renewed").length,
+    "No Response": customers.filter(c=>c.status==="No Response").length,
+  };
+  const bgs = {
+    "All":"rgba(255,255,255,0.2)","Pending":"rgba(253,224,71,0.25)",
+    "Sent":"rgba(147,197,253,0.25)","Quote Requested":"rgba(251,146,60,0.25)",
+    "Quoted":"rgba(167,139,250,0.25)","Sent to Customer":"rgba(217,70,239,0.2)",
+    "Cover Note Issued":"rgba(34,211,238,0.25)",
+    "Renewed":"rgba(134,239,172,0.25)","No Response":"rgba(252,165,165,0.25)"
+  };
+  document.getElementById("stats").innerHTML = Object.entries(counts).map(([label,val])=>`
+    <div class="stat ${filterStatus===label?'active':''}" onclick="setFilter('${label}')"
+      style="background:${bgs[label]};">
+      <div class="stat-val">${val}</div>
+      <div class="stat-label">${label}</div>
+    </div>`).join("");
+}
+
+function renderPills() {
+  const statuses = ["All","Pending","Sent","Renewed","No Response"];
+  document.getElementById("filter-pills").innerHTML = statuses.map(s=>`
+    <div class="pill ${filterStatus===s?'active':''}" onclick="setFilter('${s}')">${s}</div>`).join("");
+}
+
+function setFilter(s) {
+  filterStatus = s;
+  renderAll();
+}
+
+function renderList() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const saFilter = document.getElementById("sa-filter") ? document.getElementById("sa-filter").value.toLowerCase().trim() : "";
+  const monthFilter = document.getElementById("month-filter") ? document.getElementById("month-filter").value : "";
+  const filtered = customers.filter(c => {
+    const matchQ = (c.name||"").toLowerCase().includes(q) || (c.plate||"").toLowerCase().includes(q);
+    const matchS = filterStatus==="All" || c.status===filterStatus;
+    const matchSA = !saFilter || (c.sa_name||"").toLowerCase().includes(saFilter);
+    const expiryDate = getExpiryDate(c.expiry || "");
+    const matchMonth = !monthFilter || getMonthKey(expiryDate) === monthFilter;
+    const hideNR = !showNoResponse && c.status === "No Response" && filterStatus === "All";
+    const hideRenewed = !showRenewed && c.status === "Renewed" && filterStatus === "All";
+    // Auto-hide expired + No Response (past expiry date and no action taken)
+    const expiryStr = getExpiryDate(c.expiry || "");
+    const isExpired = isDatePast(expiryStr);
+    const hideExpiredNR = isExpired && c.status === "No Response" && filterStatus === "All";
+    // Hide customers whose expiry is more than 2 months away
+    const hideNotYetDue = !isWithin2Months(expiryStr) && filterStatus === "All";
+    return matchQ && matchS && matchSA && matchMonth && !hideNR && !hideRenewed && !hideExpiredNR && !hideNotYetDue;
+  });
+
+  if (!filtered.length) {
+    document.getElementById("customer-list").innerHTML =
+      `<div class="empty">${customers.length===0?"No data in Google Sheet yet. Add customers or check sheet headers.":"No customers match your search."}</div>`;
+    return;
+  }
+
+  // Group customers by plate number — duplicates (different packages) merged into one card
+  const groups = {};
+  const groupOrder = [];
+  filtered.forEach((c, i) => {
+    const key = (c.plate || c.name || "").toLowerCase().trim();
+    if (!groups[key]) { groups[key] = []; groupOrder.push(key); }
+    groups[key].push({c, i});
+  });
+
+  document.getElementById("customer-list").innerHTML = groupOrder.map(key => {
+    const rows = groups[key];
+    const primary = rows[0]; // Use first row for main card info
+    const c = primary.c;
+    const i = primary.i;
+    const sm = STATUS_META[c.status] || STATUS_META["Pending"];
+    const hasMultiple = rows.length > 1;
+
+    // Build quote sections for each row (package)
+    const quoteSections = rows.map(({c: rc, i: ri}) => {
+      const hasQuote = [rc.zurich,rc.sompo,rc.generali,rc.etiqa,rc.allianz].some(v => v && parseFloat(v) > 0);
+      const packageLabel = rc.remarks ? `<span style="font-size:11px;font-weight:700;color:#5B21B6;background:#EDE9FE;padding:2px 8px;border-radius:10px;">${rc.remarks}</span>` : "";
+      const quoteBtn = (rc.status === "Quoted" && hasQuote)
+        ? `<button class="btn-quote-ready" onclick="sendReadyQuote(${ri})">💰 Send Quote${rc.remarks ? ' (' + rc.remarks + ')' : ''}</button>`
+        : rc.status === "Quote Requested"
+        ? `<button class="btn-quote-pending" disabled>⏳ Preparing...${rc.remarks ? ' (' + rc.remarks + ')' : ''}</button>`
+        : rc.status === "Sent to Customer"
+        ? `<button class="btn-quote-pending" style="background:#F0ABFC;color:#6B21A8;border-color:#D946EF;" disabled>✅ Quote Sent${rc.remarks ? ' (' + rc.remarks + ')' : ''}</button>`
+        : "";
+      return `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${packageLabel}${quoteBtn}</div>`;
+    }).join("");
+
+    return `
+    <div class="card" id="card-${i}" style="border-left-color:${sm.border};">
+      <div class="card-top">
+        <div>
+          <div class="card-name">${c.name} ${hasMultiple ? '<span style="font-size:11px;background:#EDE9FE;color:#5B21B6;padding:2px 8px;border-radius:10px;margin-left:4px;">'+rows.length+' packages</span>' : ''}</div>
+          <div class="card-meta">🚗 ${c.plate||'-'} &nbsp;|&nbsp; 📅 ${getExpiryDate(c.expiry)||'-'} &nbsp;|&nbsp; 📱 ${c.phone||'-'}${c.sa_name?` &nbsp;|&nbsp; 👤 ${c.sa_name}`:''}${c.confirmed_insurer?` &nbsp;|&nbsp; ✅ ${c.confirmed_insurer}`:''}</div>
+        </div>
+        <span class="status-badge" style="background:${sm.bg};color:${sm.text};border:1px solid ${sm.border};">${c.status}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-wa" onclick="openWA(${i})" title="Send Reminder">📲 Reminder</button>
+        ${c.status === "Sent" ?
+          `<button class="btn-getquote" onclick="requestQuote(${i})">📋 Get Quote</button>` : ""}
+        ${quoteSections}
+        <button class="btn-followup" onclick="openMsgTemplate(${i},'followup')">🔔 Follow Up</button>
+        ${c.status === "Sent to Customer" ?
+          `<button class="btn-covernote" onclick="generateCoverNote(${i})">📄 Generate Cover Note</button>` : 
+          c.status === "Cover Note Issued" ?
+          `<button class="btn-covernote" disabled style="opacity:0.6;cursor:default;">✅ Cover Note Requested</button>` : ""}
+        <button class="btn-thanks" onclick="openMsgTemplate(${i},'thankyou')">🙏 Thank You</button>
+        <button class="btn-preview" onclick="togglePreview(${i})">👁 Preview</button>
+        <select class="status-select" onchange="updateStatus(${i},this.value)">
+          ${["Pending","Sent","Quote Requested","Quoted","Sent to Customer","Cover Note Issued","Renewed","No Response"].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join("")}
+        </select>
+      </div>
+      <div class="preview-box ${openPreview===i?'show':''}" id="prev-${i}"></div>
+    </div>`;
+  }).join("")
+
+  // fill preview boxes
+  filtered.forEach((c,i) => {
+    const box = document.getElementById(`prev-${i}`);
+    if (box) {
+      const name2 = (c.sa_name && c.sa_name.trim()) ? c.sa_name.trim() : saName;
+      box.innerHTML =
+        "<strong style='font-size:11px;color:#15803D;'>REMINDER</strong><pre style='white-space:pre-wrap;font-size:12px;margin:4px 0 10px;'>" + TEMPLATES.reminder(c,name2) + "</pre>" +
+        "<strong style='font-size:11px;color:#5B21B6;'>QUOTATION</strong><pre style='white-space:pre-wrap;font-size:12px;margin:4px 0 10px;'>" + buildQuotePreview(c) + "</pre>" +
+        "<strong style='font-size:11px;color:#854D0E;'>FOLLOW UP</strong><pre style='white-space:pre-wrap;font-size:12px;margin:4px 0 10px;'>" + TEMPLATES.followup(c,name2) + "</pre>" +
+        "<strong style='font-size:11px;color:#166534;'>THANK YOU</strong><pre style='white-space:pre-wrap;font-size:12px;margin:4px 0;'>" + TEMPLATES.thankyou(c,name2) + "</pre>";
+    }
+  });
+}
+
+// ── Extract last date from expiry string ─────────────────────────────────────
+function getExpiryDate(expiry) {
+  if (!expiry) return "-";
+  if (expiry.includes(" to ")) return expiry.split(" to ").pop().trim();
+  return expiry.trim();
+}
+
+const TEMPLATES = {
+  reminder: function(c, name) {
+    return "Hi " + c.name + "! Good day!" +
+      "\n\nThis is " + name + " from *Proton Melinau Auto Likas*. Hope you are doing well!" +
+      "\n\nJust a friendly reminder that your vehicle insurance is expiring soon:" +
+      "\n\n*Vehicle Details*" +
+      "\nRegistration No: " + c.plate +
+      "\nExpiry Date: " + c.expiry +
+      "\n\nWe would love to help you renew quickly and hassle-free - just let us know and we will send you a quote right away! No need to go anywhere, we handle everything for you including your *road tax renewal*." +
+      "\n\nWe also cover insurance renewals for *any brand of car or motorcycle*, so feel free to reach out for your other vehicles too." +
+      "\n\nReply *YES* or just give us a thumbs up and we will get started!" +
+      "\n\nThank you, " + c.name + "! Have a great day :)";
+  },
+  quotation: function(c, name) {
+    return "Hi " + c.name + "! Good day!" +
+      "\n\nThank you for your interest in renewing your vehicle insurance with us!" +
+      "\n\n*Quotation Details*" +
+      "\nRegistration No: " + c.plate +
+      "\nExpiry Date: " + c.expiry +
+      "\n\nPlease find your insurance quotation as attached / as discussed." +
+      "\n\nKindly confirm if you would like to proceed and we will process it immediately for you." +
+      "\n\nFeel free to contact us if you have any questions." +
+      "\n\nThank you, " + c.name + "! :)" +
+      "\n\n" + name + "\nProton Melinau Auto Likas";
+  },
+  followup: function(c, name) {
+    return "Hi " + c.name + "! Good day!" +
+      "\n\nThis is " + name + " from *Proton Melinau Auto Likas* again. Just a gentle follow up regarding your vehicle insurance renewal." +
+      "\n\nRegistration No: " + c.plate +
+      "\nExpiry Date: " + getExpiryDate(c.expiry) +
+      "\n\nYour policy is expiring soon. We would not want you to be driving without valid insurance coverage!" +
+      "\n\nKindly let us know if you would like to proceed or if you have any questions. We are happy to assist!" +
+      "\n\nThank you, " + c.name + "!" +
+      "\n\n" + name + "\nProton Melinau Auto Likas";
+  },
+  thankyou: function(c, name) {
+    return "Hi " + c.name + "! Good day!" +
+      "\n\nWe are pleased to inform you that your vehicle insurance has been successfully renewed!" +
+      "\n\n*Renewal Confirmation*" +
+      "\nRegistration No: " + c.plate +
+      "\n\nThank you for trusting *Proton Melinau Auto Likas* for your insurance renewal. We truly appreciate your support!" +
+      "\n\nIf you need any assistance in the future, do not hesitate to contact us. Drive safe!" +
+      "\n\nBest regards," +
+      "\n" + name + "\nProton Melinau Auto Likas";
+  }
+};
+
+function buildMsg(c) {
+  const name = (c.sa_name && c.sa_name.trim()) ? c.sa_name.trim() : saName;
+  return TEMPLATES.reminder(c, name);
+}
+
+function openMsgTemplate(i, type) {
+  const c = getFiltered()[i];
+  const name = (c.sa_name && c.sa_name.trim()) ? c.sa_name.trim() : saName;
+  const msg = TEMPLATES[type](c, name);
+  let ph = (c.phone||"").replace(/[\s\-]/g,"");
+  if (ph.startsWith("0")) ph = "60" + ph.slice(1);
+  window.open("https://wa.me/" + ph + "?text=" + encodeURIComponent(msg), "_blank");
+  // Auto update status based on template used
+  if (type === "reminder") updateStatus(i, "Sent");
+  if (type === "quotation") updateStatus(i, "Quoted");
+  if (type === "thankyou") updateStatus(i, "Renewed");
+}
+function getFiltered() {
+  const q = document.getElementById("search").value.toLowerCase();
+  const saFilter = document.getElementById("sa-filter") ? document.getElementById("sa-filter").value.toLowerCase().trim() : "";
+  const monthFilter = document.getElementById("month-filter") ? document.getElementById("month-filter").value : "";
+  return customers.filter(c => {
+    const matchQ = (c.name||"").toLowerCase().includes(q)||(c.plate||"").toLowerCase().includes(q);
+    const matchS = filterStatus==="All"||c.status===filterStatus;
+    const matchSA = !saFilter || (c.sa_name||"").toLowerCase().includes(saFilter);
+    const expiryDate = getExpiryDate(c.expiry || "");
+    const matchMonth = !monthFilter || getMonthKey(expiryDate) === monthFilter;
+    const hideNR = !showNoResponse && c.status === "No Response" && filterStatus === "All";
+    const hideRenewed = !showRenewed && c.status === "Renewed" && filterStatus === "All";
+    const isExpired = isDatePast(expiryDate);
+    const hideExpiredNR = isExpired && c.status === "No Response" && filterStatus === "All";
+    const hideNotYetDue = !isWithin2Months(expiryDate) && filterStatus === "All";
+    return matchQ && matchS && matchSA && matchMonth && !hideNR && !hideRenewed && !hideExpiredNR && !hideNotYetDue;
+  });
+}
+
+function openWA(i) {
+  const c = getFiltered()[i];
+  let ph=(c.phone||"").replace(/[\s\-]/g,""); if(ph.startsWith("0")) ph="60"+ph.slice(1); const url=`https://wa.me/${ph}?text=${encodeURIComponent(buildMsg(c))}`;
+  window.open(url,"_blank");
+  updateStatus(i,"Sent");
+}
+
+function copyMsg(i) {
+  const c = getFiltered()[i];
+  navigator.clipboard.writeText(buildMsg(c));
+  const btn = document.getElementById(`copy-${i}`);
+  if (btn) { btn.textContent = "✅ Copied!"; setTimeout(()=>btn.textContent="📋 Copy Msg",2000); }
+}
+
+function togglePreview(i) {
+  openPreview = openPreview===i ? null : i;
+  renderList();
+}
+
+async function updateStatus(i, status) {
+  const filtered = getFiltered();
+  const c = filtered[i];
+  const idx = customers.indexOf(c);
+  customers[idx] = {...c, status};
+
+  // Re-render full list so buttons update correctly (e.g. Get Quote → Preparing)
+  renderList();
+  renderStats();
+  renderPills();
+
+  // Save to Google Sheet via Apps Script
+  setSaving(true);
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ row: c._row, status: status, remarks: c.remarks || "" })
+    });
+    showToast("Status updated", "success");
+  } catch(e) {
+    showToast("Screen updated but Sheet sync failed", "info");
+  }
+  setSaving(false);
+}
+async function addCustomer() {
+  const name    = document.getElementById("f-name").value.trim();
+  const phone   = document.getElementById("f-phone").value.trim();
+  const plate   = document.getElementById("f-plate").value.trim();
+  const expiry  = document.getElementById("f-expiry").value.trim();
+  const sa      = document.getElementById("f-sa").value.trim();
+  const status  = document.getElementById("f-status").value;
+  const remarks = document.getElementById("f-remarks").value.trim();
+  if (!name||!phone||!plate||!expiry) { showToast("Please fill in all required fields","error"); return; }
+  const btn = document.getElementById("btn-add");
+  btn.disabled = true; btn.textContent = "⏳ Saving...";
+  setSaving(true);
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "append", values: [customers.length+1, name, phone, plate, expiry, sa, status, remarks] })
+    });
+    showToast("Customer added ✅","success");
+    ["f-name","f-phone","f-plate","f-expiry","f-sa","f-remarks"].forEach(id=>document.getElementById(id).value="");
+    document.getElementById("f-status").value="Pending";
+    switchTab("list");
+    await fetchData();
+  } catch(e) { showToast("Failed: "+e.message,"error"); }
+  btn.disabled=false; btn.textContent="✅ Add to Google Sheet";
+  setSaving(false);
+}
+
+// ── Quote preview for 👁 Preview box ────────────────────────────────────────
+function buildQuotePreview(c) {
+  const insurers = [
+    { name:"Zurich",   key:c.zurich   },
+    { name:"Sompo",    key:c.sompo    },
+    { name:"Generali", key:c.generali },
+    { name:"Etiqa",    key:c.etiqa    },
+    { name:"Allianz",  key:c.allianz  },
+  ].filter(ins => ins.key && ins.key.trim() !== "" && parseFloat(ins.key) > 0);
+  if (!insurers.length) return "(Admin has not filled in quotes yet)";
+  let lines = "Registration No: " + c.plate + "\nExpiry: " + getExpiryDate(c.expiry);
+  if (c.suminsured) lines += "\nSum Insured: RM " + c.suminsured;
+  if (c.ncd)        lines += "\nNCD: "             + c.ncd;
+  lines += "\n\nPremium Comparison:";
+  insurers.forEach(ins => {
+    const p = parseFloat(ins.key)||0;
+    lines += "\n" + ins.name + ": RM " + p.toFixed(2);
+  });
+  return lines;
+}
+
+// ── Send Ready Quote (multi-insurer from Sheet) ──────────────────────────────
+function sendReadyQuote(i) {
+  const c = getFiltered()[i];
+  const saNameUsed = (c.sa_name && c.sa_name.trim()) ? c.sa_name.trim() : saName;
+
+  const insurers = [
+    { name: "Zurich",   key: c.zurich   },
+    { name: "Sompo",    key: c.sompo    },
+    { name: "Generali", key: c.generali },
+    { name: "Etiqa",    key: c.etiqa    },
+    { name: "Allianz",  key: c.allianz  },
+  ].filter(ins => ins.key && ins.key.trim() !== "" && parseFloat(ins.key) > 0);
+
+  let insurerLines = "";
+  insurers.forEach(ins => {
+    const premium = parseFloat(ins.key) || 0;
+    insurerLines += "\n" + ins.name + ": *RM " + premium.toFixed(2) + "*";
+  });
+
+  const msg = "Hi " + c.name + "! Good day!" +
+    "\n\nThank you for your interest! Here is the insurance quotation for your vehicle:" +
+    "\n\n*Vehicle Details*" +
+    "\nRegistration No: " + c.plate +
+    "\nExpiry Date: " + getExpiryDate(c.expiry) +
+    (c.suminsured ? "\nSum Insured: RM " + c.suminsured : "") +
+    (c.ncd        ? "\nNCD: "            + c.ncd        : "") +
+    "\n\n*Premium Comparison*" +
+    insurerLines +
+    "\n\nKindly let us know which insurer you prefer and we will process it right away!" +
+    (c.remarks ? "\n\nNote: " + c.remarks : "") +
+    "\n\nThank you, " + c.name + "!" +
+    "\n\n" + saNameUsed + "\nProton Melinau Auto Likas";
+
+  let ph = (c.phone||"").replace(/[\s\-]/g,"");
+  if (ph.startsWith("0")) ph = "60" + ph.slice(1);
+  window.open("https://wa.me/" + ph + "?text=" + encodeURIComponent(msg), "_blank");
+  updateStatus(i, "Sent to Customer");
+}
+
+// ── Toggle Renewed visibility ────────────────────────────────────────────────
+function toggleRenewed() {
+  showRenewed = !showRenewed;
+  const btn = document.getElementById("toggle-renewed");
+  const count = customers.filter(c => c.status === "Renewed").length;
+  if (showRenewed) {
+    btn.style.background = "#166534";
+    btn.style.color = "white";
+    btn.innerHTML = "🏆 Hide Renewed (" + count + ")";
+  } else {
+    btn.style.background = "#DCFCE7";
+    btn.style.color = "#166534";
+    btn.innerHTML = "🏆 Show Renewed (" + count + ")";
+  }
+  renderList();
+}
+
+// ── Toggle No Response visibility ────────────────────────────────────────────
+function toggleNoResponse() {
+  showNoResponse = !showNoResponse;
+  const btn = document.getElementById("toggle-nr");
+  const nrCount = customers.filter(c => c.status === "No Response").length;
+  if (showNoResponse) {
+    btn.style.background = "#991B1B";
+    btn.style.color = "white";
+    btn.innerHTML = "🙈 Hide No Response (" + nrCount + ")";
+  } else {
+    btn.style.background = "#FEE2E2";
+    btn.style.color = "#991B1B";
+    btn.innerHTML = "👁 Show No Response (" + nrCount + ")";
+  }
+  renderList();
+}
+
+// ── Request Quote from Admin ─────────────────────────────────────────────────
+function requestQuote(i) {
+  updateStatus(i, "Quote Requested");
+  showToast("Marked as Quote Requested - admin will be notified", "success");
+}
+
+// ── Cover Note Flag with Insurer Selection ───────────────────────────────────
+function generateCoverNote(i) {
+  const c = getFiltered()[i];
+  const insurers = [
+    { name: "Zurich",   premium: c.zurich   },
+    { name: "Sompo",    premium: c.sompo    },
+    { name: "Generali", premium: c.generali },
+    { name: "Etiqa",    premium: c.etiqa    },
+    { name: "Allianz",  premium: c.allianz  },
+  ].filter(ins => ins.premium && ins.premium.trim() !== "" && parseFloat(ins.premium) > 0);
+
+  if (insurers.length === 0) {
+    showToast("No insurer quote found for this customer", "error");
+    return;
+  }
+
+  document.getElementById("cn-customer-name").textContent = c.name + " (" + c.plate + ")";
+  const optionsDiv = document.getElementById("cn-insurer-options");
+  optionsDiv.innerHTML = insurers.map(ins =>
+    `<button class="cn-insurer-btn" onclick="confirmCoverNote(${i}, '${ins.name}')">
+      <span>${ins.name}</span><span style="color:#64748B;font-weight:400;">RM ${ins.premium}</span>
+    </button>`
+  ).join("");
+
+  document.getElementById("cn-select-modal").style.display = "flex";
+}
+
+function closeCNSelectModal() {
+  document.getElementById("cn-select-modal").style.display = "none";
+}
+
+async function confirmCoverNote(i, insurerName) {
+  const c = getFiltered()[i];
+  const idx = customers.indexOf(c);
+  customers[idx] = {...c, confirmed_insurer: insurerName};
+  updateStatus(i, "Cover Note Issued");
+  showToast("Cover Note requested - " + insurerName + " ✅", "success");
+  closeCNSelectModal();
+  // Save confirmed insurer to column R
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "setCell", row: c._row, col: 18, value: insurerName })
+    });
+  } catch(e) {}
+}
+
+// Init
+fetchData();
+</script>
+</body>
+</html>
