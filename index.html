@@ -491,7 +491,7 @@ function renderList() {
 
     // Build quote sections for each row (package)
     const quoteSections = rows.map(({c: rc, i: ri}) => {
-      const hasQuote = [rc.zurich,rc.sompo,rc.generali,rc.etiqa,rc.allianz].some(v => v && parseFloat(v) > 0);
+      const hasQuote = [rc.zurich,rc.sompo,rc.generali,rc.etiqa,rc.allianz].some(v => v && cleanNumber(v) > 0);
       const packageLabel = rc.remarks ? `<span style="font-size:11px;font-weight:700;color:#5B21B6;background:#EDE9FE;padding:2px 8px;border-radius:10px;">${rc.remarks}</span>` : "";
       const quoteBtn = (rc.status === "Quoted" && hasQuote)
         ? `<button class="btn-quote-ready" onclick="sendReadyQuote(${ri})">💰 Send Quote${rc.remarks ? ' (' + rc.remarks + ')' : ''}</button>`
@@ -544,6 +544,14 @@ function renderList() {
         "<strong style='font-size:11px;color:#166534;'>THANK YOU</strong><pre style='white-space:pre-wrap;font-size:12px;margin:4px 0;'>" + TEMPLATES.thankyou(c,name2) + "</pre>";
     }
   });
+}
+
+// ── Clean currency string (remove RM, commas, spaces) ────────────────────────
+function cleanNumber(val) {
+  if (!val) return 0;
+  const cleaned = String(val).replace(/[^0-9.]/g, "");
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
 }
 
 // ── Extract last date from expiry string ─────────────────────────────────────
@@ -718,14 +726,14 @@ function buildQuotePreview(c) {
     { name:"Generali", key:c.generali },
     { name:"Etiqa",    key:c.etiqa    },
     { name:"Allianz",  key:c.allianz  },
-  ].filter(ins => ins.key && ins.key.trim() !== "" && parseFloat(ins.key) > 0);
+  ].filter(ins => ins.key && cleanNumber(ins.key) > 0);
   if (!insurers.length) return "(Admin has not filled in quotes yet)";
   let lines = "Registration No: " + c.plate + "\nExpiry: " + getExpiryDate(c.expiry);
   if (c.suminsured) lines += "\nSum Insured: RM " + c.suminsured;
   if (c.ncd)        lines += "\nNCD: "             + c.ncd;
   lines += "\n\nPremium Comparison:";
   insurers.forEach(ins => {
-    const p = parseFloat(ins.key)||0;
+    const p = cleanNumber(ins.key);
     lines += "\n" + ins.name + ": RM " + p.toFixed(2);
   });
   return lines;
@@ -742,11 +750,11 @@ function sendReadyQuote(i) {
     { name: "Generali", key: c.generali },
     { name: "Etiqa",    key: c.etiqa    },
     { name: "Allianz",  key: c.allianz  },
-  ].filter(ins => ins.key && ins.key.trim() !== "" && parseFloat(ins.key) > 0);
+  ].filter(ins => ins.key && cleanNumber(ins.key) > 0);
 
   let insurerLines = "";
   insurers.forEach(ins => {
-    const premium = parseFloat(ins.key) || 0;
+    const premium = cleanNumber(ins.key);
     insurerLines += "\n" + ins.name + ": *RM " + premium.toFixed(2) + "*";
   });
 
@@ -819,7 +827,7 @@ function generateCoverNote(i) {
     { name: "Generali", premium: c.generali },
     { name: "Etiqa",    premium: c.etiqa    },
     { name: "Allianz",  premium: c.allianz  },
-  ].filter(ins => ins.premium && ins.premium.trim() !== "" && parseFloat(ins.premium) > 0);
+  ].filter(ins => ins.premium && cleanNumber(ins.premium) > 0);
 
   if (insurers.length === 0) {
     showToast("No insurer quote found for this customer", "error");
