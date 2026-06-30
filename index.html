@@ -415,7 +415,7 @@ function renderStats() {
     "Quote Requested": customers.filter(c=>c.status==="Quote Requested").length,
     "Quoted": customers.filter(c=>c.status==="Quoted").length,
     "Sent to Customer": customers.filter(c=>c.status==="Sent to Customer").length,
-    "Cover Note Issued": customers.filter(c=>c.status==="Cover Note Issued").length,
+    "Cover Note Requested": customers.filter(c=>c.status==="Cover Note Requested").length,
     "Renewed": customers.filter(c=>c.status==="Renewed").length,
     "No Response": customers.filter(c=>c.status==="No Response").length,
   };
@@ -423,7 +423,7 @@ function renderStats() {
     "All":"rgba(255,255,255,0.2)","Pending":"rgba(253,224,71,0.25)",
     "Sent":"rgba(147,197,253,0.25)","Quote Requested":"rgba(251,146,60,0.25)",
     "Quoted":"rgba(167,139,250,0.25)","Sent to Customer":"rgba(217,70,239,0.2)",
-    "Cover Note Issued":"rgba(34,211,238,0.25)",
+    "Cover Note Requested":"rgba(34,211,238,0.25)",
     "Renewed":"rgba(134,239,172,0.25)","No Response":"rgba(252,165,165,0.25)"
   };
   document.getElementById("stats").innerHTML = Object.entries(counts).map(([label,val])=>`
@@ -520,12 +520,12 @@ function renderList() {
         <button class="btn-followup" onclick="openMsgTemplate(${i},'followup')">🔔 Follow Up</button>
         ${c.status === "Sent to Customer" ?
           `<button class="btn-covernote" onclick="generateCoverNote(${i})">📄 Generate Cover Note</button>` : 
-          c.status === "Cover Note Issued" ?
+          c.status === "Cover Note Requested" ?
           `<button class="btn-covernote" disabled style="opacity:0.6;cursor:default;">✅ Cover Note Requested</button>` : ""}
         <button class="btn-thanks" onclick="openMsgTemplate(${i},'thankyou')">🙏 Thank You</button>
         <button class="btn-preview" onclick="togglePreview(${i})">👁 Preview</button>
         <select class="status-select" onchange="updateStatus(${i},this.value)">
-          ${["Pending","Sent","Quote Requested","Quoted","Sent to Customer","Cover Note Issued","Renewed","No Response"].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join("")}
+          ${["Pending","Sent","Quote Requested","Quoted","Sent to Customer","Cover Note Requested","Renewed","No Response"].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join("")}
         </select>
       </div>
       <div class="preview-box ${openPreview===i?'show':''}" id="prev-${i}"></div>
@@ -853,7 +853,7 @@ async function confirmCoverNote(i, insurerName) {
   const c = getFiltered()[i];
   const idx = customers.indexOf(c);
   customers[idx] = {...c, confirmed_insurer: insurerName};
-  updateStatus(i, "Cover Note Issued");
+  updateStatus(i, "Cover Note Requested");
   showToast("Cover Note requested - " + insurerName + " ✅", "success");
   closeCNSelectModal();
   // Save confirmed insurer to column R
