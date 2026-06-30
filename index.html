@@ -860,7 +860,7 @@ async function confirmCoverNote(i, insurerName) {
   try {
     await fetch(SCRIPT_URL, {
       method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "setCell", row: c._row, col: 18, value: insurerName })
+      body: JSON.stringify({ action: "setCell", row: c._row, col: 16, value: insurerName })
     });
   } catch(e) {}
 }
