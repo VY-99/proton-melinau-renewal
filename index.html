@@ -435,7 +435,7 @@ function renderStats() {
 }
 
 function renderPills() {
-  const statuses = ["All","Pending","Sent","Renewed","No Response"];
+  const statuses = ["All","Pending","Sent","Quote Requested","Quoted","Sent to Customer","Cover Note Requested","Renewed","No Response"];
   document.getElementById("filter-pills").innerHTML = statuses.map(s=>`
     <div class="pill ${filterStatus===s?'active':''}" onclick="setFilter('${s}')">${s}</div>`).join("");
 }
