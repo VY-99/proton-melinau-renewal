@@ -261,28 +261,46 @@ function switchTab(tab) {
 }
 
 // ── Fetch from Sheets ────────────────────────────────────────────────────────
-async function fetchData() {
-  document.getElementById("customer-list").innerHTML = '<div class="empty">⏳ Loading from Google Sheets...</div>';
+async function fetchSheetNames() {
   try {
-    const range = encodeURIComponent(`${SHEET}!A1:R300`);
+    const res = await fetch(`${BASE}?key=${API_KEY}&fields=sheets.properties.title`);
+    const data = await res.json();
+    if (data.error) return ["CUSTOMER DATA"];
+    return data.sheets.map(s => s.properties.title);
+  } catch(e) { return ["CUSTOMER DATA"]; }
+}
+
+async function fetchOneSheet(sheetName) {
+  try {
+    const range = encodeURIComponent(`${sheetName}!A1:R300`);
     const res = await fetch(`${BASE}/values/${range}?key=${API_KEY}&valueRenderOption=FORMATTED_VALUE`);
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
+    if (data.error) return [];
     const rows = data.values || [];
-    if (rows.length < 2) { customers = []; renderAll(); return; }
+    if (rows.length < 2) return [];
     const hdrs = rows[0].map(h => h.toLowerCase().trim());
-    customers = rows.slice(1).map((row, i) => {
-      const obj = { _row: i+2 };
+    if (!hdrs.includes("name")) return []; // skip sheets without proper headers
+    return rows.slice(1).map((row, i) => {
+      const obj = { _row: i+2, _sheet: sheetName };
       hdrs.forEach((h,j) => obj[h] = row[j] || "");
       if (!obj.status) obj.status = "Pending";
       return obj;
     }).filter(r => r.name);
-    showToast(`Loaded ${customers.length} customers ✅`, "success");
+  } catch(e) { return []; }
+}
+
+async function fetchData() {
+  document.getElementById("customer-list").innerHTML = '<div class="empty">⏳ Loading from Google Sheets...</div>';
+  try {
+    const tabs = await fetchSheetNames();
+    const allData = await Promise.all(tabs.map(tab => fetchOneSheet(tab)));
+    customers = allData.flat();
+    showToast(`Loaded ${customers.length} customers from ${tabs.length} sheet(s) ✅`, "success");
     populateMonthFilter();
     renderAll();
   } catch(e) {
     showToast("Failed to load: " + e.message, "error");
-    document.getElementById("customer-list").innerHTML = `<div class="empty">❌ Could not load data.<br/><small>${e.message}</small><br/><br/>Make sure your Google Sheet is shared as <b>Anyone with the link → Editor</b>.</div>`;
+    document.getElementById("customer-list").innerHTML = `<div class="empty">❌ Could not load data.<br/><small>${e.message}</small></div>`;
   }
 }
 
@@ -684,7 +702,7 @@ async function updateStatus(i, status) {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ row: c._row, status: status, remarks: c.remarks || "", sheet: SHEET })
+      body: JSON.stringify({ row: c._row, status: status, remarks: c.remarks || "", sheet: c._sheet || SHEET })
     });
     showToast("Status updated", "success");
   } catch(e) {
@@ -709,7 +727,7 @@ async function addCustomer() {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "append", values: [customers.length+1, name, phone, plate, expiry, sa, status, remarks], sheet: SHEET })
+      body: JSON.stringify({ action: "append", values: [customers.length+1, name, phone, plate, expiry, sa, status, remarks], sheet: "CUSTOMER DATA" })
     });
     showToast("Customer added ✅","success");
     ["f-name","f-phone","f-plate","f-expiry","f-sa","f-remarks"].forEach(id=>document.getElementById(id).value="");
@@ -863,7 +881,7 @@ async function confirmCoverNote(i, insurerName) {
   try {
     await fetch(SCRIPT_URL, {
       method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "setCell", row: c._row, col: 16, value: insurerName, sheet: SHEET })
+      body: JSON.stringify({ action: "setCell", row: c._row, col: 16, value: insurerName, sheet: c._sheet || SHEET })
     });
   } catch(e) {}
 }
