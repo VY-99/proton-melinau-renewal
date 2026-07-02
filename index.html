@@ -115,6 +115,9 @@
         SA: <span id="sa-display" onclick="editSA()" style="font-weight:600;cursor:pointer;">Your Name ✏️</span>
         <input id="sa-input" type="text" value="Your Name" onblur="saveSA()" onkeydown="if(event.key==='Enter')saveSA()" style="display:none;" />
       </div>
+      <select id="sheet-selector" onchange="switchSheet(this.value)" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;outline:none;">
+        <option value="CUSTOMER DATA" style="color:#1E293B;">CUSTOMER DATA</option>
+      </select>
       <button class="btn-refresh" onclick="fetchData()">🔄 Refresh</button>
     </div>
   </div>
@@ -199,7 +202,7 @@
 <script>
 const API_KEY  = "AIzaSyAzX-jkMLLokqyXcQCgnrC8XOgJY5esXu8";
 const SHEET_ID = "1rXpbGSiyByQZk8QMmViZ4n5RFEMaJm3MBY-QG7-5luI";
-const SHEET    = "CUSTOMER DATA";
+let SHEET = "CUSTOMER DATA"; // default, changes when month is selected
 let showNoResponse = false;
 let showRenewed = false;
 const BASE       = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
@@ -290,13 +293,13 @@ function renderAll() {
   renderList();
 }
 
-// ── Check if date is within 2 months from today ──────────────────────────────
+// ── Check if date is within 3 months from today ──────────────────────────────
 function isWithin2Months(dateStr) {
   if (!dateStr || dateStr === "-") return true; // show if no date
   const today = new Date();
   today.setHours(0,0,0,0);
   const twoMonthsLater = new Date(today);
-  twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 2);
+  twoMonthsLater.setMonth(twoMonthsLater.getMonth() + 3);
 
   // Try DD/MM/YYYY
   const parts = dateStr.split("/");
@@ -681,7 +684,7 @@ async function updateStatus(i, status) {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ row: c._row, status: status, remarks: c.remarks || "" })
+      body: JSON.stringify({ row: c._row, status: status, remarks: c.remarks || "", sheet: SHEET })
     });
     showToast("Status updated", "success");
   } catch(e) {
@@ -706,7 +709,7 @@ async function addCustomer() {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "append", values: [customers.length+1, name, phone, plate, expiry, sa, status, remarks] })
+      body: JSON.stringify({ action: "append", values: [customers.length+1, name, phone, plate, expiry, sa, status, remarks], sheet: SHEET })
     });
     showToast("Customer added ✅","success");
     ["f-name","f-phone","f-plate","f-expiry","f-sa","f-remarks"].forEach(id=>document.getElementById(id).value="");
@@ -860,12 +863,32 @@ async function confirmCoverNote(i, insurerName) {
   try {
     await fetch(SCRIPT_URL, {
       method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ action: "setCell", row: c._row, col: 16, value: insurerName })
+      body: JSON.stringify({ action: "setCell", row: c._row, col: 16, value: insurerName, sheet: SHEET })
     });
   } catch(e) {}
 }
 
+// ── Sheet Tab Management ─────────────────────────────────────────────────────
+async function fetchSheetTabs() {
+  try {
+    const res = await fetch(`${BASE}?key=${API_KEY}&fields=sheets.properties.title`);
+    const data = await res.json();
+    if (data.error) return;
+    const tabs = data.sheets.map(s => s.properties.title);
+    const sel = document.getElementById("sheet-selector");
+    sel.innerHTML = tabs.map(tab =>
+      `<option value="${tab}" style="color:#1E293B;" ${tab === SHEET ? 'selected' : ''}>${tab}</option>`
+    ).join("");
+  } catch(e) {}
+}
+
+function switchSheet(tabName) {
+  SHEET = tabName;
+  fetchData();
+}
+
 // Init
+fetchSheetTabs();
 fetchData();
 </script>
 </body>
